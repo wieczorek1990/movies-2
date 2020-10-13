@@ -45,3 +45,37 @@ class CreateAndListMovieTestCase(test.TestCase):
                                  'external_api_response': {}
                              },
                          ])
+
+
+class DeleteAndUpdateMovieTestCase(test.TestCase):
+    def test_delete(self):
+        movie = models.Movie(title='Song of Water and Mud',
+                             year='2020',
+                             runtime='136 min',
+                             genre='Fantasy',
+                             external_api_response={})
+        movie.save()
+        response = self.client.delete('/movies/{}/'.format(movie.pk))
+        self.assertEqual(response.status_code, 204)
+
+    def test_update(self):
+        movie = models.Movie(title='Song of Water and Mud',
+                             year='2020',
+                             runtime='136 min',
+                             genre='Fantasy',
+                             external_api_response={})
+        movie.save()
+        response = self.client.put('/movies/{}/'.format(movie.pk),
+                                   data={'title': 'Song of Ice and Mud',
+                                         'year': '2021',
+                                         'runtime': '133 min',
+                                         'genre': 'Science Fiction'},
+                                   content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        movie = models.Movie.objects.get(pk=movie.pk)
+        self.assertEqual(movie.to_json(),
+                         {'title': 'Song of Ice and Mud',
+                          'year': '2021',
+                          'runtime': '133 min',
+                          'genre': 'Science Fiction',
+                          'external_api_response': {}})

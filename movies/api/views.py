@@ -3,6 +3,9 @@ from django.conf import settings
 from rest_framework import exceptions
 from rest_framework import response
 from rest_framework import views
+from rest_framework import viewsets
+from rest_framework import mixins
+
 from api import models
 from api import serializers
 
@@ -51,3 +54,10 @@ class CreateAndListMovieView(views.APIView):
         movies = models.Movie.objects.all().order_by('title')
         return response.Response(status=200,
                                  data={'movies': [movie.to_json() for movie in movies]})
+
+
+class DeleteAndUpdateModelViewSet(mixins.UpdateModelMixin,
+                                  mixins.DestroyModelMixin,
+                                  viewsets.GenericViewSet):
+    queryset = models.Movie.objects.all()
+    serializer_class = serializers.MovieSerializer
