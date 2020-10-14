@@ -70,6 +70,16 @@ Connect with GitHub and setup automatic `master` deployments.
 
 Set stack to container: `heroku stack:set container`.
 
+## Routes
+
+* POST /movies/
+* GET /movies/
+* DELETE /movies/:pk/
+* UPDATE /movies/:pk/
+* POST /comments/
+* GET /comments/?movie_pk=
+* GET /top/?start=&end=
+
 ## Project decisions
 
 I decided to use PostgreSQL because it's popular and available on Heroku.
@@ -78,4 +88,4 @@ On the `/top/` route I decided not to include movies with 0 comments.
 
 ## Notes
 
-* Took me 6h 20m to finish the task
+* Took me 6h 30m to finish the task
