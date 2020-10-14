@@ -57,6 +57,18 @@ Deploy to production:
     * generate OMDb API key: http://www.omdbapi.com/apikey.aspx
     * generate Djago secret with `pwgen -sy 50 1`
 
+# Heroku deployment
+
+Environment variables:
+
+* Install plugin `heroku plugins:install heroku-config`.
+* Use `heroku config:pull` and `heroku config:push`.
+
+Add a database: `Heroku Postgres` in Resources.
+
+Connect with GitHub and setup automatic `master` deployments.
+
+Set stack to container: `heroku stack:set container`.
 
 ## Project decisions
 
