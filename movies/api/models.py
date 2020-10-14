@@ -16,3 +16,14 @@ class Movie(models.Model):
             'genre': self.genre,
             'external_api_response': self.external_api_response,
         }
+
+
+class Comment(models.Model):
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
+    text_body = models.TextField()
+
+    def to_json(self):
+        return {
+            'movie_pk': self.movie.pk,
+            'text_body': self.text_body,
+        }

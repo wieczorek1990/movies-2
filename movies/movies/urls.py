@@ -23,4 +23,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('movies/', views.CreateAndListMovieView.as_view()),
     path('movies/<int:pk>/', views.DeleteAndUpdateModelViewSet.as_view({'put': 'update', 'delete': 'destroy'})),
+    path('comments/', views.CreateAndListCommentView.as_view()),
 ]

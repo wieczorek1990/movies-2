@@ -79,3 +79,55 @@ class DeleteAndUpdateMovieTestCase(test.TestCase):
                           'runtime': '133 min',
                           'genre': 'Science Fiction',
                           'external_api_response': {}})
+
+
+class CreateAndListCommentTestCase(test.TestCase):
+    def test_create(self):
+        movie = models.Movie(title='Song of Water and Mud',
+                             year='2020',
+                             runtime='136 min',
+                             genre='Fantasy',
+                             external_api_response={})
+        movie.save()
+
+        response = self.client.post('/comments/',
+                                    data={'movie': movie.pk,
+                                          'text_body': 'My first comment ever.'},
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+
+    def test_create_movie_not_found(self):
+        response = self.client.post('/comments/',
+                                    data={'movie': 1000,
+                                          'text_body': 'My first comment ever.'},
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+
+    def test_list(self):
+        first_movie = models.Movie(title='Song of Water and Mud',
+                                   year='2020',
+                                   runtime='136 min',
+                                   genre='Fantasy',
+                                   external_api_response={})
+        first_movie.save()
+        second_movie = models.Movie(title='Song of Ice and Fire',
+                                    year='2020',
+                                    runtime='136 min',
+                                    genre='Fantasy',
+                                    external_api_response={})
+        second_movie.save()
+
+        comment = models.Comment(movie=first_movie, text_body='It is my first comment.')
+        comment.save()
+        comment = models.Comment(movie=first_movie, text_body='It is my second comment.')
+        comment.save()
+        comment = models.Comment(movie=second_movie, text_body='It is my third comment.')
+        comment.save()
+
+        response = self.client.get('/comments/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()['comments']), 3)
+
+        response = self.client.get('/comments/?movie_pk={}'.format(second_movie.pk))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()['comments']), 1)

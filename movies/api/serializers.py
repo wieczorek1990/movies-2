@@ -11,3 +11,8 @@ class MovieSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Movie
         fields = ('title', 'year', 'runtime', 'genre')
+
+
+class CreateCommentSerializer(serializers.Serializer):
+    movie = serializers.PrimaryKeyRelatedField(queryset=models.Movie.objects.all())
+    text_body = serializers.CharField()

@@ -63,3 +63,37 @@ class DeleteAndUpdateModelViewSet(mixins.UpdateModelMixin,
                                   viewsets.GenericViewSet):
     queryset = models.Movie.objects.all()
     serializer_class = serializers.MovieSerializer
+
+
+def is_int(s):
+    try:
+        int(s)
+        return True
+    except ValueError:
+        return False
+
+
+class CreateAndListCommentView(views.APIView):
+    @staticmethod
+    def post(request):
+        serializer = serializers.CreateCommentSerializer(data=request.data)
+        if not serializer.is_valid():
+            return response.Response(status=400)
+
+        comment = models.Comment(movie=serializer.validated_data['movie'],
+                                 text_body=serializer.validated_data['text_body'])
+        comment.save()
+
+        return response.Response(status=200, data={'comment': comment.to_json()})
+
+    @staticmethod
+    def get(request):
+        movie_pk = request.query_params.get('movie_pk', None)
+        if movie_pk is None:
+            comments = models.Comment.objects.all()
+        else:
+            if not is_int(movie_pk):
+                return response.Response(status=400)
+            comments = models.Comment.objects.filter(movie=int(movie_pk))
+        return response.Response(status=200,
+                                 data={'comments': [comment.to_json() for comment in comments]})
