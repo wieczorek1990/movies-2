@@ -36,6 +36,7 @@ class CreateAndListMovieView(views.APIView):
 
         try:
             movie = models.Movie.objects.get(title=body['title'])
+            status = 200
         except models.Movie.DoesNotExist:
             movie = models.Movie(title=body['title'],
                                  year=body['year'],
@@ -43,8 +44,9 @@ class CreateAndListMovieView(views.APIView):
                                  genre=body['genre'],
                                  external_api_response=body)
             movie.save()
+            status = 201
 
-        return response.Response(status=200, data={
+        return response.Response(status=status, data={
             'movie': movie.to_json(),
             'external_api_response': body,
         })

@@ -11,7 +11,7 @@ class CreateAndListMovieTestCase(test.TestCase):
         response = self.client.post('/movies/',
                                     data={'title': 'Guardians of the Galaxy Vol. 2'},
                                     content_type='application/json')
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 201)
 
     def test_list_movies(self):
         movie = models.Movie(title='Song of Water and Mud',
