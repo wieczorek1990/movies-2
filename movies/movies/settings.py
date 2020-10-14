@@ -13,6 +13,9 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 import os
 from pathlib import Path
 
+import dj_database_url
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -77,16 +80,21 @@ WSGI_APPLICATION = 'movies.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'movies',
-        'USER': os.environ['POSTGRES_USERNAME'],
-        'PASSWORD': os.environ['POSTGRES_PASSWORD'],
-        'HOST': 'postgres',
-        'PORT': '5432',
+if 'DATABASE_URL' in os.environ:
+    DATABASES = {
+        'default': dj_database_url.config(default=os.environ['DATABASE_URL']),
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'movies',
+            'USER': os.environ['POSTGRES_USERNAME'],
+            'PASSWORD': os.environ['POSTGRES_PASSWORD'],
+            'HOST': 'postgres',
+            'PORT': '5432',
+        }
+    }
 
 
 # Password validation
