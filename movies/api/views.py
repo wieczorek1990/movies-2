@@ -7,6 +7,7 @@ from rest_framework import views
 from rest_framework import viewsets
 from rest_framework import mixins
 
+from api import helpers
 from api import models
 from api import serializers
 
@@ -66,14 +67,6 @@ class DeleteAndUpdateModelViewSet(mixins.UpdateModelMixin,
     serializer_class = serializers.MovieSerializer
 
 
-def is_int(s):
-    try:
-        int(s)
-        return True
-    except ValueError:
-        return False
-
-
 class CreateAndListCommentView(views.APIView):
     @staticmethod
     def post(request):
@@ -93,19 +86,11 @@ class CreateAndListCommentView(views.APIView):
         if movie_pk is None:
             comments = models.Comment.objects.all()
         else:
-            if not is_int(movie_pk):
+            if not helpers.is_int(movie_pk):
                 return response.Response(status=400)
             comments = models.Comment.objects.filter(movie=int(movie_pk))
         return response.Response(status=200,
                                  data={'comments': [comment.to_json() for comment in comments]})
-
-
-def is_float(s):
-    try:
-        float(s)
-        return True
-    except ValueError:
-        return False
 
 
 class TopView(views.APIView):
@@ -114,7 +99,7 @@ class TopView(views.APIView):
         end = request.query_params.get('end', None)
         if start is None or end is None:
             return response.Response(status=400)
-        if not is_float(start) or not is_float(end):
+        if not helpers.is_float(start) or not helpers.is_float(end):
             return response.Response(status=400)
         start = datetime.datetime.fromtimestamp(float(start))
         end = datetime.datetime.fromtimestamp(float(end))
