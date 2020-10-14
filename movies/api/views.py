@@ -1,3 +1,4 @@
+import datetime
 import requests
 from django.conf import settings
 from rest_framework import exceptions
@@ -97,3 +98,47 @@ class CreateAndListCommentView(views.APIView):
             comments = models.Comment.objects.filter(movie=int(movie_pk))
         return response.Response(status=200,
                                  data={'comments': [comment.to_json() for comment in comments]})
+
+
+def is_float(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
+
+
+class TopView(views.APIView):
+    def get(self, request):
+        start = request.query_params.get('start', None)
+        end = request.query_params.get('end', None)
+        if start is None or end is None:
+            return response.Response(status=400)
+        if not is_float(start) or not is_float(end):
+            return response.Response(status=400)
+        start = datetime.datetime.fromtimestamp(float(start))
+        end = datetime.datetime.fromtimestamp(float(end))
+
+        data = {}
+        comments = models.Comment.objects.filter(created_at__gte=start, created_at__lte=end)
+        movie_pks = comments.values_list('movie__pk', flat=True)
+        movies = models.Movie.objects.filter(pk__in=movie_pks)
+        for movie in movies:
+            data[movie.pk] = 0
+        for comment in comments:
+            data[comment.movie.pk] += 1
+        ranking = []
+        for movie_id, total_comments in data.items():
+            ranking.append({'movie_id': movie_id, 'total_comments': total_comments})
+        ranking = sorted(ranking, key=lambda k: -k['total_comments'])
+        rank = 1
+        for index in range(len(ranking)):
+            if index == len(ranking) - 1:
+                next = None
+            else:
+                next = ranking[index + 1]
+            current = ranking[index]
+            current['rank'] = rank
+            if next is not None and next['total_comments'] != current['total_comments']:
+                rank += 1
+        return response.Response(status=200, data=ranking)

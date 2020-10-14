@@ -1,4 +1,6 @@
 import mock
+import django.utils.timezone
+from datetime import timedelta
 from django import test
 
 from api import models
@@ -131,3 +133,50 @@ class CreateAndListCommentTestCase(test.TestCase):
         response = self.client.get('/comments/?movie_pk={}'.format(second_movie.pk))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.json()['comments']), 1)
+
+
+class TopTestCase(test.TestCase):
+    def test_top(self):
+        first_movie = models.Movie(title='Song of Water and Mud 1',
+                                   year='2020',
+                                   runtime='136 min',
+                                   genre='Fantasy',
+                                   external_api_response={})
+        first_movie.save()
+        comment = models.Comment(movie=first_movie, text_body='1')
+        comment.save()
+        comment = models.Comment(movie=first_movie, text_body='1')
+        comment.save()
+        second_movie = models.Movie(title='Song of Water and Mud 2',
+                                    year='2020',
+                                    runtime='136 min',
+                                    genre='Fantasy',
+                                    external_api_response={})
+        second_movie.save()
+        comment = models.Comment(movie=second_movie, text_body='1')
+        comment.save()
+        third_movie = models.Movie(title='Song of Water and Mud 3',
+                                   year='2020',
+                                   runtime='136 min',
+                                   genre='Fantasy',
+                                   external_api_response={})
+        third_movie.save()
+        comment = models.Comment(movie=third_movie, text_body='1')
+        comment.save()
+        fourth_movie = models.Movie(title='Song of Water and Mud 4',
+                                    year='2020',
+                                    runtime='136 min',
+                                    genre='Fantasy',
+                                    external_api_response={})
+        fourth_movie.save()
+
+        now = django.utils.timezone.now()
+        day_ago = now - timedelta(days=1)
+        start = day_ago.timestamp()
+        end = now.timestamp()
+        response = self.client.get('/top/?start={}&end={}'.format(start, end))
+        self.assertEqual(response.status_code, 200)
+        self.assertListEqual(response.json(),
+                             [{'movie_id': first_movie.pk, 'rank': 1, 'total_comments': 2},
+                              {'movie_id': second_movie.pk, 'rank': 2, 'total_comments': 1},
+                              {'movie_id': third_movie.pk, 'rank': 2, 'total_comments': 1}])

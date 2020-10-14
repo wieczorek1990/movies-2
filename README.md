@@ -56,3 +56,10 @@ Deploy to production:
     * generate envs (look into /envs/)
     * generate OMDb API key: http://www.omdbapi.com/apikey.aspx
     * generate Djago secret with `pwgen -sy 50 1`
+
+
+## Project decisions
+
+I decided to use PostgreSQL because it's popular and available on Heroku.
+
+On the `/top/` route I decided not to include movies with 0 comments.
