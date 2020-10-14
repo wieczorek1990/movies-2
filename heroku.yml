@@ -2,7 +2,10 @@ build:
   docker:
     web: Dockerfile
 run:
-  web: /srv/bin/wait_heroku $DATABASE_URL -- python manage.py migrate && uwsgi --http 0.0.0.0:$PORT --wsgi-file movies/wsgi.py --master --processes 32 --threads 8
+  web: >
+    /srv/bin/wait_heroku $DATABASE_URL --
+    python manage.py migrate &&
+    uwsgi --http 0.0.0.0:$PORT --wsgi-file movies/wsgi.py --master --processes 32 --threads 8
 setup:
   addons:
   - plan: heroku-postgresql
