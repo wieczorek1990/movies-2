@@ -75,3 +75,7 @@ Set stack to container: `heroku stack:set container`.
 I decided to use PostgreSQL because it's popular and available on Heroku.
 
 On the `/top/` route I decided not to include movies with 0 comments.
+
+## Notes
+
+* Took me 6h 20m to finish the task
